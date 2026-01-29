@@ -4,7 +4,7 @@ function validateData(e){
 
     // get the word that the user entered in the input, store in variable named word
     // TO DO
-    let word;
+    let word = document.getElementById("my-word").value;
 
     word = word.trim();
 
@@ -14,6 +14,7 @@ function validateData(e){
     }else{
         // if the word is valid, let's make our call to the function that works with the API
         // TO DO
+        getWord(word);
     }
 }
 
@@ -21,89 +22,104 @@ function getWord(word){
 
     // places on the page used for output
     // TO DO
+    let outputSection = document.getElementById("output");
+    let userWord = document.querySelector("#user-word span");
+    let display = document.getElementById("display-word-info");
 
     // un-hide the output section
     // TO DO
+    outputSection.classList.remove("hidden");
+
 
     // clear the list of any previous output
     resetDisplay();
 
     // create ajax object
     // TO DO
+    const xhr = new XMLHttpRequest();
 
     // set withCredentials property on ajax object to true (we will access with a key)
     // TO DO
+    xhr.withCredentials = true;
 
     // ready state change event listener
-    // TO DO
-        
+    xhr.addEventListener("readystatechange", function(){
         // when we get a response...
         // TO DO
+        if(this.readyState === this.DONE){
             // log the returned text to the console
             // TO DO	
+            console.log(this.responseText);
 
             // parse the response into JSON
             // TO DO
+            let wordInfo = JSON.parse(this.responseText);
 
             // check to see if an error was returned from the call
             // TO DO
-            /* PLACE THESE COMMENTS INSIDE OF THE FIRST IF CONDITIONAL THAT CHECKS FOR A VALID ENGLISH WORD AS INSTRUCTED, THEN DELETE THIS LINE AND THE ONE THAT CLOSES THE GROUP
+            if(wordInfo.hasOwnProperty("query") || wordInfo.success === false){
                 // display an error message to the user
                 // TO DO
+                userWord.innerHTML = `<strong>${word}</strong> is not a valid word`;
 
                 // clear the list to allow for an error message to be displayed
                 // TO DO
+                resetDisplay();
 
                 // ask the user to enter a valid word
-                // display.innerHTML = "<li>Please enter a new word and try again</li>";
-            */
-    
-            // check to see if the word is valid but the dictionary doesn't have any definitions
-            // TO DO
-
-            /* PLACE THESE COMMENTS INSIDE OF THE ELSE IF CONDITIONAL THAT CHECKS FOR A VALID ENGLISH WORD THAT THERE ISN'T A DEFINITION FOR AS INSTRUCTED, THEN DELETE THIS LINE AND THE ONE THAT CLOSES THE GROUP
+                display.innerHTML = "<li>Please enter a new word and try again</li>";
+            }else if(!wordInfo.results){
                 // display the word the user entered on the page
-                // userWord.innerHTML = `<strong>${word}</strong>`;
+                userWord.innerHTML = `<strong>${word}</strong>`;
 
                 // display a message explaining that the dictionary does not include definitions of this word
-                // display.innerHTML = `<li>The dictionary does not include definitions for this word</li>`;
-
-            */
-
+                display.innerHTML = `<li>The dictionary does not include definitions for this word</li>`;
+            
             // handle displaying definitions for a valid word
-            /* PLACE THESE COMMENTS INSIDE OF THE ELSE CONDITIONAL THAT HANDLES VALID WORD AND DEFINITIONS RETURNED AS INSTRUCTED, THEN DELETE THIS LINE AND THE ONE THAT CLOSES THE GROUP
+            }else{
                 // this means we got our data back and can display it from the JSON
                 // display the word entered on the page
                 // TO DO
+                userWord.innerHTML = `<strong>${word}</strong>`
                 
                 // clear the list to allow for new definitions to be displayed (use the helper function)
                 // TO DO
+                resetDisplay();
 
                 // iterate through array of returned definitions and add to string for output
                 // TO DO
+                for(let object of wordInfo.results){
                     // each definition is displayed in a list item
                     // TO DO
-            */
-
-                // clear the user input to make room for another word
+                    display.innerHTML += `<li>${object.definition}</li>`
+                }
+                
+                // clear out the input for the word
                 resetInput();
-        
+            }
+        }     
+    });
 
     // start of endpoint to API
     // TO DO
+    const PATH = "https://wordsapiv1.p.rapidapi.com/words/"
 
     // full path of endpoint to get a definition
     // TO DO
+    let url = `${PATH}${word}`
 
     // open the connection with the ajax object
     // TO DO
+    xhr.open("GET", url)
 
     // set the required headers on the object
-    // xhr.setRequestHeader("x-rapidapi-key", "TO DO"); // TO DO - ADD YOUR API KEY HERE
+    xhr.setRequestHeader("x-rapidapi-key", "df89e32c09mshf69a2dfbaefc3ebp1de1c8jsnea0ff3d093d7"); // TO DO - ADD YOUR API KEY HERE
     // TO DO
+    xhr.setRequestHeader('x-rapidapi-host', 'wordsapiv1.p.rapidapi.com');
 
     // send the request to the API
     // TO DO
+    xhr.send();
 }
 
 // this helper function clears out the input and output for the user word
